@@ -1,0 +1,15 @@
+# macos
+
+.DS_Store
+
+
+# jupyter
+
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+
+# virtual environment
+
+env
+
