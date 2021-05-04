@@ -6,6 +6,9 @@
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
+# catboost
+catboost_info
+
 
 # virtual environment
 env
