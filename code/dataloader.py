@@ -89,8 +89,8 @@ class BaseDataset(torch.utils.data.Dataset):
             open(self.root/"client_to_indices.p", "rb"))
 
     def save_client_to_indices(self):
-        pickle.dump(self.client_to_indices, open(
-            self.root/"client_to_indices.p", "wb"))
+        pickle.dump(self.client_to_indices,
+                    open(self.root/"client_to_indices.p", "wb"))
 
 
 class AgeGroupMLDataset(BaseDataset):
@@ -146,24 +146,13 @@ class AgeGroupClfDataset(BaseDataset):
             'bins'].to_numpy()
 
     def __getitem__(self, idx: int):
-        # outputs ((n, c), idx)
-        # dim(n,c) are  self.num_of_subseq x self.subseq_length x feature_dim
-
+        # returns ((numerical, categorical), target_bin)
         n, c = self.get_sequence(idx)
 
-        sn = torch.zeros((self.num_of_subseq, self.subseq_length, n.size(1))).type(
-            torch.float32)
-        sc = torch.zeros(
-            (self.num_of_subseq, self.subseq_length, c.size(1))).type(torch.int)
+        seq_len = len(n)
+        start_index = np.random.randint(0, seq_len-SUBSEQUENCE_LENGTH+1)
+        end_index = start_index + SUBSEQUENCE_LENGTH
+        n = n[start_index:end_index]
+        c = c[start_index:end_index]
 
-        seq_len = n.size(0)
-        for i in range(self.num_of_subseq):
-            start_index = np.random.randint(0, seq_len-self.subseq_length+1)
-            end_index = start_index + self.subseq_length
-            nsubseq = n[start_index:end_index]
-            csubseq = c[start_index:end_index]
-
-            sn[i] = nsubseq
-            sc[i] = csubseq
-
-        return (sn, sc), idx
+        return (n, c), self.targets[idx]

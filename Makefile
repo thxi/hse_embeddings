@@ -12,3 +12,6 @@ unzip:
 		rm -rf __MACOSX && \
 		rm -rf data_old
 	cd data && unzip -o client_to_indices.zip
+
+zip:
+	cd data && zip client_to_indices.zip client_to_indices.p
