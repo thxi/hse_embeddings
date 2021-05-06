@@ -9,12 +9,14 @@ class Classifier(nn.Module):
         self,
         numerical_input_dim,
         cat_vocab_sizes,
+        cat_embedding_dim,
         embedding_dim,
     ):
         super(Classifier, self).__init__()
         self.encoder = Encoder(
             numerical_input_dim=numerical_input_dim,
             cat_vocab_sizes=cat_vocab_sizes,
+            cat_embedding_dim=cat_embedding_dim,
             embedding_dim=embedding_dim,
         )
         self.decoder = Decoder(embedding_dim)

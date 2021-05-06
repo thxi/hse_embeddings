@@ -8,6 +8,7 @@ class Encoder(nn.Module):
         self,
         numerical_input_dim,
         cat_vocab_sizes,
+        cat_embedding_dim,
         embedding_dim,
     ):
         # only 1 categorical feature for now
@@ -16,17 +17,17 @@ class Encoder(nn.Module):
         self.embedding_dim = embedding_dim
         self.cat_vocab_sizes = cat_vocab_sizes
         # TODO: experiment with out dim
-        self.cat_embedding_dim = cat_vocab_sizes[0] // 2
+        self.cat_embedding_dim = cat_embedding_dim
 
         self.num_event_encoder = nn.BatchNorm1d(numerical_input_dim)
 
         self.cat_encoder = nn.Embedding(cat_vocab_sizes[0],
                                         self.cat_embedding_dim)
 
-        self.sequence_encoder = nn.GRU(
-            numerical_input_dim + self.cat_embedding_dim,
-            embedding_dim,
-            batch_first=False)
+        self.sequence_encoder = nn.GRU(numerical_input_dim +
+                                       self.cat_embedding_dim,
+                                       embedding_dim,
+                                       batch_first=False)
 
     def forward(self, n, c):
         # receives BATCH_SIZE*NUM_OF_SEQUENCES*SUBSEQUENCE_LENGTH*input_dim

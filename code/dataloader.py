@@ -58,9 +58,6 @@ class BaseDataset(torch.utils.data.Dataset):
         self.categorical = torch.from_numpy(
             self.df[['small_group']].to_numpy()).type(torch.int)
 
-    def __len__(self):
-        return len(self.client_to_indices)
-
     def get_sequence(self, idx):
         s, e = self.client_to_indices[idx]
         n = self.numerical[s:e]
@@ -95,10 +92,12 @@ class AgeGroupMLDataset(BaseDataset):
     def __init__(self,
                  subseq_length=SUBSEQUENCE_LENGTH,
                  num_of_subseq=NUM_OF_SUBSEQUENCES,
+                 num_observations=30000,
                  root=Path('data/')):
         super().__init__(subseq_length, num_of_subseq, root)
 
         self.targets = list(range(len(self.idx2client)))
+        self.targets = self.targets[:num_observations]
 
     def __getitem__(self, idx: int):
         # outputs ((n, c), idx)
@@ -124,11 +123,15 @@ class AgeGroupMLDataset(BaseDataset):
 
         return (sn, sc), idx
 
+    def __len__(self):
+        return len(self.targets)
+
 
 class AgeGroupClfDataset(BaseDataset):
     def __init__(self,
                  subseq_length=SUBSEQUENCE_LENGTH,
                  num_of_subseq=NUM_OF_SUBSEQUENCES,
+                 num_observations=30000,
                  root=Path('data/')):
         super().__init__(subseq_length, num_of_subseq, root)
 
@@ -140,6 +143,7 @@ class AgeGroupClfDataset(BaseDataset):
 
         self.targets = self.target_df.sort_values(
             'client_id')['bins'].to_numpy()
+        self.targets = self.targets[:num_observations]
 
     def __getitem__(self, idx: int):
         # returns ((numerical, categorical), target_bin)
@@ -152,3 +156,6 @@ class AgeGroupClfDataset(BaseDataset):
         c = c[start_index:end_index]
 
         return (n, c), self.targets[idx]
+
+    def __len__(self):
+        return len(self.targets)
