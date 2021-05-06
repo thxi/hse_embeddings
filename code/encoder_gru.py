@@ -1,46 +1,44 @@
 import torch
 
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 
 
 class Encoder(nn.Module):
     def __init__(
-            self,
-            numerical_input_dim,
-            embedding_dim,
-            cat_vocab_sizes,
-            subseq_length):
+        self,
+        numerical_input_dim,
+        cat_vocab_sizes,
+        embedding_dim,
+    ):
         # only 1 categorical feature for now
         super(Encoder, self).__init__()
         self.numerical_input_dim = numerical_input_dim
         self.embedding_dim = embedding_dim
         self.cat_vocab_sizes = cat_vocab_sizes
-        self.subseq_length = subseq_length
+        # TODO: experiment with out dim
+        self.cat_embedding_dim = cat_vocab_sizes[0] // 2
 
         self.num_event_encoder = nn.BatchNorm1d(numerical_input_dim)
 
-        # why this out dim??
-        self.cat_encoder = nn.Embedding(
-            cat_vocab_sizes[0], int(embedding_dim/2))
+        self.cat_encoder = nn.Embedding(cat_vocab_sizes[0],
+                                        self.cat_embedding_dim)
 
-        self.sequence_encoder = nn.Sequential(
-            nn.GRU(numerical_input_dim+int(embedding_dim/2),
-                   embedding_dim, batch_first=False)
-        )
+        self.sequence_encoder = nn.GRU(
+            numerical_input_dim + self.cat_embedding_dim,
+            embedding_dim,
+            batch_first=False)
 
     def forward(self, n, c):
         # receives BATCH_SIZE*NUM_OF_SEQUENCES*SUBSEQUENCE_LENGTH*input_dim
+        subseq_length = n.shape[-2]
 
         n = n.view(-1, self.numerical_input_dim)
         n = self.num_event_encoder(n)
-        # n = n.view(-1, SUBSEQUENCE_LENGTH, int(self.embedding_dim/2))
-        n = n.view(-1, self.subseq_length, self.numerical_input_dim)
+        n = n.view(-1, subseq_length, self.numerical_input_dim)
 
         c = c.view(-1, 1)
         c = self.cat_encoder(c)
-        c = c.view(-1, self.subseq_length, int(self.embedding_dim/2))
+        c = c.view(-1, subseq_length, self.cat_embedding_dim)
 
         x = torch.cat((n, c), 2)
 
