@@ -52,9 +52,9 @@ def train_classifier(classifier,
     """train function for a classifier"""
     # yapf: disable
     if enable_train_mode == None:
-        enable_train_mode = lambda clf: clf.train()
+        enable_train_mode = lambda: classifier.train()
     if enable_test_mode == None:
-        enable_test_mode = lambda clf: clf.eval()
+        enable_test_mode = lambda: classifier.eval()
     # yapf: enable
 
     # might introduce bugs if model is not fully on cpu or gpu
@@ -120,3 +120,5 @@ def train_classifier(classifier,
 
         print(f'Epoch {epoch}, train acc: {train_acc}, val acc: {val_acc}')
         print(f'train loss: {epoch_loss}; val loss: {epoch_val_loss}')
+
+    return train_losses, train_accuracy, val_losses, val_accuracy
