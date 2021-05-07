@@ -14,7 +14,7 @@ def train_ml_model(encoder, NUM_EPOCHS, dataloader, num_of_subsequences,
     for epoch in tqdm(range(NUM_EPOCHS)):
         encoder.train()
         epoch_losses = []
-        for batch_idx, (sequences, labels) in enumerate(dataloader):
+        for sequences, labels in dataloader:
             n, c = sequences[0], sequences[1]
             n = n.to(device)
             c = c.to(device)
