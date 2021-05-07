@@ -122,3 +122,38 @@ def train_classifier(classifier,
         print(f'train loss: {epoch_loss}; val loss: {epoch_val_loss}')
 
     return train_losses, train_accuracy, val_losses, val_accuracy
+
+
+def train_tabnet(encoder, NUM_EPOCHS, dataloader, mining_func, loss_func,
+                 optimizer):
+    """train function for metric learning"""
+
+    # might introduce bugs if model is not fully on cpu or gpu
+    device = next(encoder.parameters()).device
+
+    train_losses = []
+
+    for epoch in tqdm(range(NUM_EPOCHS)):
+        encoder.train()
+        epoch_losses = []
+        for x, labels in dataloader:
+            x = x.to(device)
+
+            labels = labels.to(device)
+
+            embeddings, _ = encoder(x)
+            indices_tuple = mining_func(embeddings, labels)
+            loss = loss_func(embeddings, labels, indices_tuple)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            epoch_losses.append(loss.item())
+
+        epoch_loss = torch.tensor(epoch_losses).mean()
+        train_losses.append(epoch_loss)
+
+        print("Epoch {} Loss = {}".format(epoch, epoch_loss))
+
+    return train_losses
