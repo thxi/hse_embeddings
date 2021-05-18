@@ -21,9 +21,6 @@ class Encoder(nn.Module):
 
         self.num_event_encoder = nn.BatchNorm1d(numerical_input_dim)
 
-        self.cat_encoder = nn.Embedding(cat_vocab_sizes[0],
-                                        self.cat_embedding_dim)
-
         self.sequence_encoder = nn.GRU(embedding_dim,
                                        embedding_dim,
                                        batch_first=False)

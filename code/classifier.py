@@ -21,8 +21,6 @@ class Classifier(nn.Module):
         )
         self.decoder = Decoder(embedding_dim)
 
-        self.encoder_frozen = False
-
     def forward(self, n, c):
         embeddings = self.encoder(n, c)
         outputs = self.decoder(embeddings)

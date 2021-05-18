@@ -20,7 +20,7 @@ class AgeGroupHandmadeDataset(torch.utils.data.Dataset):
         self.y = self.client_df.reset_index()['bins']
 
         self.X = torch.from_numpy(self.X.to_numpy()).type(torch.float32)
-        self.y = torch.from_numpy(self.y.to_numpy()).type(torch.int)
+        self.y = torch.from_numpy(self.y.to_numpy()).type(torch.LongTensor)
 
     def __len__(self):
         return len(self.y)
